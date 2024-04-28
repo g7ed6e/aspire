@@ -90,6 +90,7 @@
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="$(MicrosoftExtensionsTimeProviderTestingVersion)" />
     <!-- external dependencies -->
     <PackageVersion Include="Confluent.Kafka" Version="2.3.0" />
+
     <PackageVersion Include="Dapper" Version="2.1.37" />
     <PackageVersion Include="DnsClient" Version="1.7.0" />
     <PackageVersion Include="Google.Protobuf" Version="3.26.1" />
@@ -150,12 +151,16 @@
     <PackageVersion Include="Testcontainers.Redis" Version="$(TestcontainersPackageVersion)" />
     <PackageVersion Include="Testcontainers.Nats" Version="$(TestcontainersPackageVersion)" />
     <!-- playground apps dependencies -->
+    <PackageVersion Include="CoreWCF.Http" Version="1.5.2" />
+    <PackageVersion Include="CoreWCF.NetTcp" Version="1.5.2" />
     <PackageVersion Include="Dapr.AspNetCore" Version="1.13.0" />
     <PackageVersion Include="Microsoft.Orleans.Clustering.AzureStorage" Version="8.1.0-nightly.20240307.1" />
     <PackageVersion Include="Microsoft.Orleans.Persistence.AzureStorage" Version="8.1.0-nightly.20240307.1" />
     <PackageVersion Include="Microsoft.Orleans.Client" Version="8.1.0-nightly.20240307.1" />
     <PackageVersion Include="Microsoft.Orleans.Server" Version="8.1.0-nightly.20240307.1" />
     <PackageVersion Include="Microsoft.Orleans.Sdk" Version="8.1.0-nightly.20240307.1" />
+    <PackageVersion Include="System.ServiceModel.Http" Version="8.0.0" />
+    <PackageVersion Include="System.ServiceModel.NetTcp" Version="8.0.0" />
     <!-- Pinned version for Component Governance - Remove when root dependencies are updated -->
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="Newtonsoft.Json.Schema" Version="3.0.15" />

@@ -1608,10 +1608,10 @@ internal sealed class ApplicationExecutor(ILogger<ApplicationExecutor> logger,
                         $"The endpoint '{ea.Name}' for resource '{modelResourceName}' requested a proxy ({nameof(ea.IsProxied)} is true). Non-container resources cannot be proxied when both {nameof(ea.TargetPort)} and {nameof(ea.Port)} are specified with the same value.");
                 }
 
-                if (appResource.DcpResource is ExecutableReplicaSet && ea.TargetPort is int)
+                if (appResource.DcpResource is ExecutableReplicaSet ers && ers.Spec.Replicas > 1 && ea.TargetPort is int)
                 {
                     throw new InvalidOperationException(
-                        $"Resource '{modelResourceName}' can have multiple replicas, and it uses endpoint '{ea.Name}' that has {nameof(ea.TargetPort)} property set. Each replica must have a unique port; setting {nameof(ea.TargetPort)} is not allowed.");
+                        $"Resource '{modelResourceName}' uses multiple replicas, and it uses endpoint '{ea.Name}' that has {nameof(ea.TargetPort)} property set. Each replica must have a unique port; setting {nameof(ea.TargetPort)} is not allowed.");
                 }
             }
 
