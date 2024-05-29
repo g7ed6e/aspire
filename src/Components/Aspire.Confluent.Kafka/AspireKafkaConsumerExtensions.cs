@@ -28,7 +28,7 @@ public static class AspireKafkaConsumerExtensions
     /// <param name="configureSettings">An optional method for customizing the <see cref="KafkaConsumerSettings"/>.</param>
     /// <param name="configureBuilder">An optional method used for customizing the <see cref="ConsumerBuilder{TKey,TValue}"/>.</param>
     /// <remarks>Reads the configuration from "Aspire:Kafka:Consumer" section.</remarks>
-    public static void AddKafkaConsumer<TKey, TValue>(this IHostApplicationBuilder builder, string connectionName, Action<KafkaConsumerSettings>? configureSettings = null, Action<ConsumerBuilder<TKey, TValue>>? configureBuilder = null)
+    public static void AddKafkaConsumer<TKey, TValue>(this IHostApplicationBuilder builder, string connectionName, Action<KafkaConsumerSettings>? configureSettings = null, Action<IServiceProvider, ConsumerBuilder<TKey, TValue>>? configureBuilder = null)
         => AddKafkaConsumer(builder, DefaultConfigSectionName, configureSettings, configureBuilder, connectionName, serviceKey: null);
 
     /// <summary>
@@ -39,7 +39,7 @@ public static class AspireKafkaConsumerExtensions
     /// <param name="configureSettings">An optional method for customizing the <see cref="KafkaConsumerSettings"/>.</param>
     /// <param name="configureBuilder">An optional method used for customizing the <see cref="ConsumerBuilder{TKey,TValue}"/>.</param>
     /// <remarks>Reads the configuration from "Aspire:Kafka:Consumer:{name}" section.</remarks>
-    public static void AddKeyedKafkaConsumer<TKey, TValue>(this IHostApplicationBuilder builder, string name, Action<KafkaConsumerSettings>? configureSettings = null, Action<ConsumerBuilder<TKey, TValue>>? configureBuilder = null)
+    public static void AddKeyedKafkaConsumer<TKey, TValue>(this IHostApplicationBuilder builder, string name, Action<KafkaConsumerSettings>? configureSettings = null, Action<IServiceProvider, ConsumerBuilder<TKey, TValue>>? configureBuilder = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
 
@@ -50,7 +50,7 @@ public static class AspireKafkaConsumerExtensions
         IHostApplicationBuilder builder,
         string configurationSectionName,
         Action<KafkaConsumerSettings>? configureSettings,
-        Action<ConsumerBuilder<TKey, TValue>>? configureBuilder,
+        Action<IServiceProvider, ConsumerBuilder<TKey, TValue>>? configureBuilder,
         string connectionName,
         string? serviceKey)
     {
@@ -102,16 +102,16 @@ public static class AspireKafkaConsumerExtensions
         }
     }
 
-    private static ConsumerConnectionFactory<TKey, TValue> CreateConsumerConnectionFactory<TKey, TValue>(IServiceProvider serviceProvider, Action<ConsumerBuilder<TKey, TValue>>? configureBuilder, KafkaConsumerSettings settings)
+    private static ConsumerConnectionFactory<TKey, TValue> CreateConsumerConnectionFactory<TKey, TValue>(IServiceProvider serviceProvider, Action<IServiceProvider, ConsumerBuilder<TKey, TValue>>? configureBuilder, KafkaConsumerSettings settings)
         => new(CreateConsumerBuilder(serviceProvider, configureBuilder, settings), settings.Config);
 
-    private static ConsumerBuilder<TKey, TValue> CreateConsumerBuilder<TKey, TValue>(IServiceProvider serviceProvider, Action<ConsumerBuilder<TKey, TValue>>? configureBuilder, KafkaConsumerSettings settings)
+    private static ConsumerBuilder<TKey, TValue> CreateConsumerBuilder<TKey, TValue>(IServiceProvider serviceProvider, Action<IServiceProvider, ConsumerBuilder<TKey, TValue>>? configureBuilder, KafkaConsumerSettings settings)
     {
         settings.Validate();
 
         ConsumerBuilder<TKey, TValue> builder = new(settings.Config);
         ILogger logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(ConfluentKafkaCommon.LogCategoryName);
-        configureBuilder?.Invoke(builder);
+        configureBuilder?.Invoke(serviceProvider, builder);
 
         try
         {

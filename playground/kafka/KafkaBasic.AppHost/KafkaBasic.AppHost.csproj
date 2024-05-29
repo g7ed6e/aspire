@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\..\src\Aspire.Hosting.Kafka\Aspire.Hosting.Kafka.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\Consumer\Consumer.csproj" />
     <ProjectReference Include="..\Producer\Producer.csproj" />
+    <ProjectReference Include="..\SchemaRegistryAvroProducer\SchemaRegistryAvroProducer.csproj" />
   </ItemGroup>
 
 </Project>

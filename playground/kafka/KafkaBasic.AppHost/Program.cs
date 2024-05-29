@@ -7,14 +7,38 @@ var kafka = builder.AddKafka("kafka")
     .WithKafkaUI(kafkaUi => kafkaUi.WithHostPort(8080));
 
 builder.AddProject<Projects.Producer>("producer")
-    .WithReference(kafka)
-    .WithArgs(kafka.Resource.Name);
+    .WithReference(kafka);
 
 builder.AddProject<Projects.Consumer>("consumer")
-    .WithReference(kafka)
-    .WithArgs(kafka.Resource.Name);
+    .WithReference(kafka);
 
-builder.AddKafka("kafka2").WithKafkaUI();
+var schemaRegistry = builder
+    .AddContainer(name: "schema-registry", "cp-schema-registry", "7.6.1")
+    .WithImageRegistry("confluentinc")
+    .WithEndpoint(name: "primary", targetPort: 8081, port: 8081, isProxied: false, scheme: "http");
+
+var kafka2 = builder.AddKafka("kafka2")
+    .WithEnvironment(context =>
+    {
+        var schemaRegistryEndpoint = schemaRegistry.GetEndpoint("primary");
+        var schemaRegistryEndpointReference = ReferenceExpression.Create(
+            $"http://{schemaRegistryEndpoint.Property(EndpointProperty.Host)}:{schemaRegistryEndpoint.Property(EndpointProperty.Port)}");
+         context.EnvironmentVariables["KAFKA_SCHEMA_REGISTRY_URL"] = schemaRegistryEndpointReference;
+    })
+    .WithKafkaUI();
+
+schemaRegistry.WithEnvironment(context =>
+{
+    // Get the broker endpoint
+    var brokerEndpoint = kafka2.GetEndpoint("internal");
+    var brokerConnectionReference =
+         ReferenceExpression.Create($"{brokerEndpoint.ContainerHost}:{brokerEndpoint.Property(EndpointProperty.Port)}");
+    context.EnvironmentVariables["SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS"] = brokerConnectionReference;
+    context.EnvironmentVariables["SCHEMA_REGISTRY_HOST_NAME"] = "localhost";
+});
+
+builder.AddProject<Projects.SchemaRegistryAvroProducer>("avroProducer")
+    .WithReference(kafka2);
 
 // This project is only added in playground projects to support development/debugging
 // of the dashboard. It is not required in end developer code. Comment out this code
