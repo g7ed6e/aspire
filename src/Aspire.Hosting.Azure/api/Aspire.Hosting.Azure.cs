@@ -170,6 +170,11 @@ namespace Aspire.Hosting.Azure
         public object ResourceGroup { get { throw null; } }
     }
 
+    public sealed partial class AzureContainerAppsPublisher : Publishing.IDistributedApplicationPublisher
+    {
+        public System.Threading.Tasks.Task PublishAsync(ApplicationModel.DistributedApplicationModel model, System.Threading.CancellationToken cancellationToken) { throw null; }
+    }
+
     public sealed partial class AzureProvisioningOptions
     {
         public global::Azure.Provisioning.ProvisioningBuildOptions ProvisioningBuildOptions { get { throw null; } }
